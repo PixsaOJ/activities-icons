@@ -29,7 +29,7 @@ const ActivitiesIcons = new Lang.Class({
         this.box.add_actor(this.appButton);
 
         this.overButton = new St.Button();
-        this.overIcon = new St.Icon({icon_name: 'focus-windows-symbolic', style_class: 'activity-icon'});
+        this.overIcon = new St.Icon({icon_name: 'focus-windows-symbolic', style_class: 'activity-icon-ws'});
         this.overButton.add_actor(this.overIcon);
         this.overButton.connect('clicked', () => this._changePage(false));
         this.overButton.connect('scroll-event', (actor, event) => this._scrollWorkspace(actor, event));
