@@ -3,7 +3,6 @@ const PanelMenu = imports.ui.panelMenu;
 const St = imports.gi.St;
 const Clutter = imports.gi.Clutter;
 const Meta = imports.gi.Meta;
-const Lang = imports.lang;
 const GObject = imports.gi.GObject;
 const Config = imports.misc.config;
 const Version = parseInt(Config.PACKAGE_VERSION.split('.')[0]);
