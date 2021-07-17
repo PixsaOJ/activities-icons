@@ -4,6 +4,7 @@ const St = imports.gi.St;
 const Clutter = imports.gi.Clutter;
 const Meta = imports.gi.Meta;
 const Lang = imports.lang;
+const GObject = imports.gi.GObject;
 const Config = imports.misc.config;
 const Version = parseInt(Config.PACKAGE_VERSION.split('.')[0]);
 
@@ -15,33 +16,34 @@ const DirBack = Version == 3 ? Meta.MotionDirection.UP : Meta.MotionDirection.LE
 const DirForward = Version == 3 ? Meta.MotionDirection.DOWN : Meta.MotionDirection.RIGHT;
 
 let activities;
-let button;
+let buttonWorkspace;
+let buttonApps;
 
-const AppsIcon = new Lang.Class({
-    Name: 'AppsIcon',
-    Extends: PanelMenu.Button,
+const AppsIcon = GObject.registerClass(
+    class AppsIcon extends PanelMenu.Button {
 
     _init()
     {
-        this.parent(0.0, null, true);
 
+        super._init()
+        
         this.wm = global.workspace_manager;
-
         this.box = new St.BoxLayout({style_class: 'activity-box'});
 
         this.appButton = new St.Button();
         this.appButton.child = new St.Icon({icon_name: 'view-app-grid-symbolic', style_class: 'system-status-icon activity-icon'});
         this.appButton.connect('clicked', () => this._changePage(true));
-        this.appButton.connect('scroll-event', (actor, event) => this._scrollWindows(actor, event));
-        this.box.add_actor(this.appButton);
+        this.appButton.connect('scroll-event', (self, event) => this._scrollWindows(self, event));
+        this.box.add_child(this.appButton);
 
-        this.actor.add_child(this.box);
-    },
+        this.add_child(this.box);
+
+    }
 
     destroy()
     {
         this.parent();
-    },
+    }
 
     _changePage(appsButtonChecked)
     {
@@ -66,7 +68,7 @@ const AppsIcon = new Lang.Class({
             ShowAppsButton.checked = appsButtonChecked;
             MainOverview._onShowAppsButtonToggled();
         }
-    },
+    }
 
     _scrollWindows(actor, event)
     {
@@ -87,17 +89,16 @@ const AppsIcon = new Lang.Class({
         }
 
         return Clutter.EVENT_STOP;
-    },
+    }
 
 });
 
-const WorkspaceIcon = new Lang.Class({
-    Name: 'WorkspaceIcon',
-    Extends: PanelMenu.Button,
+const WorkspaceIcon = GObject.registerClass(
+    class WorkspaceIcon extends PanelMenu.Button {
 
     _init()
     {
-        this.parent(0.0, null, true);
+        super._init();
 
         this.wm = global.workspace_manager;
 
@@ -106,16 +107,16 @@ const WorkspaceIcon = new Lang.Class({
         this.overButton = new St.Button();
         this.overButton.child = new St.Icon({icon_name: 'focus-windows-symbolic', style_class: 'system-status-icon activity-icon-ws'});
         this.overButton.connect('clicked', () => this._changePage(false));
-        this.overButton.connect('scroll-event', (actor, event) => this._scrollWorkspace(actor, event));
-        this.box.add_actor(this.overButton);
+        this.overButton.connect('scroll-event', (self, event) => this._scrollWorkspace(self, event));
+        this.box.add_child(this.overButton);
 
-        this.actor.add_child(this.box);
-    },
+        this.add_child(this.box);
+    }
 
     destroy()
     {
         this.parent();
-    },
+    }
 
     _changePage(appsButtonChecked)
     {
@@ -140,9 +141,9 @@ const WorkspaceIcon = new Lang.Class({
             ShowAppsButton.checked = appsButtonChecked;
             MainOverview._onShowAppsButtonToggled();
         }
-    },
+    }
 
-    _scrollWorkspace(actor, event)
+    _scrollWorkspace(self, event)
     {
         let workspace = this.wm.get_active_workspace();
 
@@ -183,6 +184,7 @@ function enable()
 
 function disable()
 {
-    button.destroy();
+    buttonWorkspace.destroy();
+    buttonApps.destroy();
     activities.container.show();
 }
